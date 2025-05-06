@@ -1,2 +1,0 @@
-# Training
-NeoSoft training repo
