@@ -7,7 +7,7 @@
 - Each class and their attributes and methods.
 - strftime() and strptime() Format Codes.
 
-## MySQL - Stored Procedure [file](StoredProcedures.sql)
+## MySQL - Stored Procedure - [StoredProcedures.sql](StoredProcedures.sql)
 
 - Simple SP
 - SP with parameters
