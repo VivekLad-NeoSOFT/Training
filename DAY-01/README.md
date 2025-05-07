@@ -35,3 +35,8 @@
 - AVG()
 - SUM()
 - Aggregate functions with 'Group By' clause
+
+## MySQL - LIMIT and OFFSET - [Limit_Offset.sql](Limit_Offset.sql)
+
+- LIMIT
+- OFFSET
