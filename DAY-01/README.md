@@ -1,6 +1,6 @@
 # Day-1
 
-## Understanding of Python's **datetime** module - [datetime_module.py](dateitme_module.py)
+## Understanding of Python's **datetime** module - [datetime_module.py](datetime_module.py)
 
 - Constants of datetime module module.
 - Available classes
