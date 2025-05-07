@@ -23,6 +23,15 @@
 - Use of view
 - Updating a view (Dropping method)
 - Dropping a view
-- Updatable views
+- Updatable views\*
 - Check view definition
 - List all views
+
+## MySQL - Aggregate functions
+
+- MIN()
+- MAX()
+- COUNT()
+- AVG()
+- SUM()
+- Aggregate functions with 'Group By' clause
