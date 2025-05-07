@@ -27,7 +27,7 @@
 - Check view definition
 - List all views
 
-## MySQL - Aggregate functions
+## MySQL - Aggregate functions - [aggregate_functions.sql](aggregate_functions.sql)
 
 - MIN()
 - MAX()
