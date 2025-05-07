@@ -16,3 +16,13 @@
 - Updating existing SP
 - List all SPs
 - See code of a SP
+
+## MySQL - View - [view.sql](view.sql)
+
+- Creating a view
+- Use of view
+- Updating a view (Dropping method)
+- Dropping a view
+- Updatable views
+- Check view definition
+- List all views
