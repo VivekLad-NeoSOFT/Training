@@ -8,7 +8,8 @@ from mysql.connector import Error
 
 class ExtractData:
 
-    def read_api(self, url: str, key: str) -> list[dict[str, Any]] | None:
+    @staticmethod
+    def read_api(url: str, key: str) -> list[dict[str, Any]] | None:
         headers = {
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
             'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:136.0) Gecko/20100101 Firefox/136.0',
@@ -18,12 +19,13 @@ class ExtractData:
         try:
             response = requests.get(url, headers=headers)
             if response:
-                return json.load(response.json())
+                return json.loads(response.text)
             return []
-        except requests.exceptions.RequestException as e:
+        except Exception as e:
             print(f'API request failed: {e}')
 
-    def read_file(self, file_path: str, file_type: Literal['csv', 'xlsx', 'json']) -> list[dict[str, Any]] | None:
+    @staticmethod
+    def read_file(file_path: str, file_type: Literal['csv', 'xlsx', 'json']) -> list[dict[str, Any]] | None:
         if file_type == 'csv':
             try:
                 data = pd.read_csv(file_path)
@@ -52,7 +54,8 @@ class ExtractData:
             except Exception as e:
                 print(f'JSON file read failed: {e}')
 
-    def read_database(self, host: str, username: str, password: str, database: str, table: str) -> list[dict[str, Any]]:
+    @staticmethod
+    def read_database(host: str, username: str, password: str, database: str, table: str) -> list[dict[str, Any]]:
         try:
             with mysql.connector.connect(
                 host=host,
