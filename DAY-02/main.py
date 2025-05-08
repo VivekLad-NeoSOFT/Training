@@ -2,6 +2,7 @@ import os
 from etl.extract import ExtractData
 from etl.transform import TransformData
 from etl.load import LoadData
+from customer_reports import GenerateReport
 
 # 1) Extract data
 ed = ExtractData()
@@ -57,4 +58,14 @@ ld.to_file(cleaned_df, json_file_path, 'json')
 
 # dump data into a MySQL Database
 table = 'etltemp'
-ld.to_database(cleaned_df, host, username, password, database, table)
+# ld.to_database(cleaned_df, host, username, password, database, table)
+
+# 4) Generate reports (Customer table)
+mysql_data = ed.read_database(host, username, password, database, table)
+gr = GenerateReport(mysql_data)
+
+# Customers per city
+gr.customers_per_city()
+
+# Customers per state
+gr.customers_per_state()
