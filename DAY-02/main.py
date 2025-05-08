@@ -58,6 +58,7 @@ ld.to_file(cleaned_df, json_file_path, 'json')
 
 # dump data into a MySQL Database
 table = 'etltemp'
+# NOTE: Uncomment following line to dump data in database.
 # ld.to_database(cleaned_df, host, username, password, database, table)
 
 # 4) Generate reports (Customer table)
