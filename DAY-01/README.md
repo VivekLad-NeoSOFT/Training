@@ -7,7 +7,7 @@
 - Each class and their attributes and methods.
 - strftime() and strptime() Format Codes.
 
-## MySQL - Stored Procedure - [StoredProcedures.sql](StoredProcedures.sql)
+## MySQL - Stored Procedure - [StoredProcedures.sql](stored_procedures.sql)
 
 - Simple SP
 - SP with parameters
@@ -36,7 +36,7 @@
 - SUM()
 - Aggregate functions with 'Group By' clause
 
-## MySQL - LIMIT and OFFSET - [Limit_Offset.sql](Limit_Offset.sql)
+## MySQL - LIMIT and OFFSET - [Limit_Offset.sql](limit_offset.sql)
 
 - LIMIT
 - OFFSET
