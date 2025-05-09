@@ -105,7 +105,7 @@ ANATR	10625	1997-08-08	1997-08-08
 */
 
 
--- 5) LEAD() and LAG():
+-- 5) LEAD() and LAG()
 -- Compare current and next order date:
 SELECT 
     customer_id,

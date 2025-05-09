@@ -36,7 +36,33 @@
 - SUM()
 - Aggregate functions with 'Group By' clause
 
-## MySQL - LIMIT and OFFSET - [Limit_Offset.sql](limit_offset.sql)
+## MySQL - LIMIT and OFFSET - [limit_offset.sql](limit_offset.sql)
 
 - LIMIT
 - OFFSET
+
+## MySQL - JOINS & UNIONS - [joins_unions.sql](joins_unions.sql)
+
+- INNER JOIN
+- LEFT JOIN
+- RIGHT JOIN
+- CROSS JOIN
+- SELF JOIN
+
+- UNION
+- UNION ALL
+
+## MySQL - Window functions - [window_functions.sql](window_functions.sql)
+
+- ROW_NUMBER()
+- RANK() and DENSE_RANK()
+- FIRST_VALUE() and LAST_VALUE()
+- NTH_VALUE()
+- LEAD() and LAG()
+- NTILE(n)
+- All in one
+
+## MySQL - Triggers - [triggers.sql](triggers.sql)
+
+- Create a trigger
+- Testing triggers
