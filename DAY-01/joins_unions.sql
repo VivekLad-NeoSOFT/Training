@@ -7,6 +7,10 @@ A JOIN clause is used to combine rows from two or more tables, based on a relate
 4) CROSS JOIN: The CROSS JOIN keyword returns all records from both tables.
 5) SELF JOIN: A self join is a regular join, but the table is joined with itself.
 
+6) Semi-Join: A semi-join returns rows from the left table where a match exists in the right table, 
+but doesn't return columns from the right table.
+7) Anti-Join: An anti-join returns rows from the left table where no match exists in the right table.
+
 */
 -- Dataset -> Northwind Traders dataset.
 
@@ -143,6 +147,43 @@ LEFT JOIN employees e2 ON e1.reports_to = e2.employee_id;
 9	Anne	Steven
 */
 
+-- 6) List all customers who have placed at least one order:
+SELECT customer_id, company_name
+FROM customers c
+WHERE EXISTS (
+    SELECT 1
+    FROM orders o
+    WHERE o.customer_id = c.customer_id
+);
+
+-- Output:
+/*
+# customer_id	company_name
+ALFKI	Alfreds Futterkiste
+ANATR	Ana Trujillo Emparedados y helados
+ANTON	Antonio Moreno Taquería
+AROUT	Around the Horn
+BSBEV	B's Beverages
+BERGS	Berglunds snabbköp
+BLAUS	Blauer See Delikatessen
+BLONP	Blondesddsl père et fils
+*/
+
+-- 7) List customers who have never placed an order:
+SELECT customer_id, company_name
+FROM customers c
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM orders o
+    WHERE o.customer_id = c.customer_id
+);
+
+-- Output:
+/*
+# customer_id	company_name
+FISSA	FISSA Fabrica Inter. Salchichas S.A.
+PARIS	Paris spécialités
+*/
 
 /*
 The UNION operator is used to combine the result-set of two or more SELECT statements,
