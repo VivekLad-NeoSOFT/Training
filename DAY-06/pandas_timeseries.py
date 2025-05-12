@@ -9,7 +9,7 @@ Here's a categorized list of the most important ones:
     - pd.period_range(): Generates a range of periods.
     - pd.to_timedelta(): Converts input to timedelta.
 
-2. Date/Time Properties (available on datetime-like Series or Index):
+2) Date/Time Properties (available on datetime-like Series or Index):
     - .dt.date, .dt.time
     - .dt.year, .dt.month, .dt.day
     - .dt.hour, .dt.minute, .dt.second
@@ -18,11 +18,33 @@ Here's a categorized list of the most important ones:
     - .dt.quarter
     - .dt.tz,
     - .dt.floor(), .dt.ceil(), .dt.round()
+
+- Frequency parametrs:
+    'B': Business Day
+    'D': Calendar day
+    'W': Weekly
+    'M': Month end
+    'BM': Business month end
+    'MS': Month start
+    'BMS': Business month start
+    'Q': Quarter end
+    'BQ': Business quarter end
+    'QS': Quarter start
+    'BQS': Business quarter start
+    'A' or 'Y': Year end
+    'BA' or 'BY': Business year end
+    'AS' or 'YS': Year start
+    'BAS' or 'BYS': Business year start
+    'H': Hourly
+    'T' or 'min': Minutely
+    'S': Secondly
+    'L' or 'ms': Milliseconds
+    'U': Microseconds
+    'N': Nanoseconds
 """
 
 
 import pandas as pd
-import numpy as np
 
 # 1) Creating Date/Time Data:
 
@@ -118,6 +140,9 @@ dtype: object
 """
 
 # 2.4) pandas.Series.dt.year - The year of the datetime.
+datetime_series = pd.Series(
+    pd.date_range("2000-01-01", periods=3, freq="YE")
+)
 datetime_series.dt.year
 
 # Output:
@@ -310,4 +335,17 @@ idx.month_name()
 # Output:
 """
 Index(['January', 'February', 'March'], dtype='object')
+"""
+
+# 2.20) Aggregate functions:
+index = pd.date_range('1/1/2000', periods=9, freq='min')
+series = pd.Series(range(9), index=index)
+series.resample('3min').agg(['sum', 'mean', 'max'])
+
+# Output:
+"""
+ 	                sum 	mean 	max
+2000-01-01 00:00:00 	3 	1.0 	2
+2000-01-01 00:03:00 	12 	4.0 	5
+2000-01-01 00:06:00 	21 	7.0 	8
 """
