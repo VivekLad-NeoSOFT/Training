@@ -9,7 +9,7 @@ Here's a categorized list of the most important ones:
     - pd.period_range(): Generates a range of periods.
     - pd.to_timedelta(): Converts input to timedelta.
 
-2) Date/Time Properties (available on datetime-like Series or Index):
+2) Date/Time properties (available on datetime-like Series or Index):
     - .dt.date, .dt.time
     - .dt.year, .dt.month, .dt.day
     - .dt.hour, .dt.minute, .dt.second
@@ -340,12 +340,16 @@ Index(['January', 'February', 'March'], dtype='object')
 # 2.20) Aggregate functions:
 index = pd.date_range('1/1/2000', periods=9, freq='min')
 series = pd.Series(range(9), index=index)
-series.resample('3min').agg(['sum', 'mean', 'max'])
-
+series.resample('3min').agg(
+    [
+        'sum', 'mean', 'max', 'min',
+        'first', 'last', 'std'
+    ]
+)
 # Output:
 """
- 	                sum 	mean 	max
-2000-01-01 00:00:00 	3 	1.0 	2
-2000-01-01 00:03:00 	12 	4.0 	5
-2000-01-01 00:06:00 	21 	7.0 	8
+	sum 	mean 	max 	min 	first 	last 	std
+2000-01-01 00:00:00 	3 	1.0 	2 	0 	0 	2 	1.0
+2000-01-01 00:03:00 	12 	4.0 	5 	3 	3 	5 	1.0
+2000-01-01 00:06:00 	21 	7.0 	8 	6 	6 	8 	1.0
 """
