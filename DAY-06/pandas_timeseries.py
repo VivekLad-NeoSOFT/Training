@@ -342,14 +342,29 @@ index = pd.date_range('1/1/2000', periods=9, freq='min')
 series = pd.Series(range(9), index=index)
 series.resample('3min').agg(
     [
-        'sum', 'mean', 'max', 'min',
-        'first', 'last', 'std'
+        'sum', 'mean',
+        'max', 'min',
+        'first', 'last',
+        'std', 'count'
     ]
 )
+
 # Output:
 """
-	sum 	mean 	max 	min 	first 	last 	std
-2000-01-01 00:00:00 	3 	1.0 	2 	0 	0 	2 	1.0
-2000-01-01 00:03:00 	12 	4.0 	5 	3 	3 	5 	1.0
-2000-01-01 00:06:00 	21 	7.0 	8 	6 	6 	8 	1.0
+	sum 	mean 	max 	min 	first 	last 	std 	count
+2000-01-01 00:00:00 	3 	1.0 	2 	0 	0 	2 	1.0 	3
+2000-01-01 00:03:00 	12 	4.0 	5 	3 	3 	5 	1.0 	3
+2000-01-01 00:06:00 	21 	7.0 	8 	6 	6 	8 	1.0 	3
+"""
+
+# 2.21) pandas.Series.dt.day_name - Return the day names with specified locale.
+s = pd.Series(pd.date_range(start='2018-01-01', freq='D', periods=3))
+s.dt.day_name()
+
+# Output:
+"""
+0       Monday
+1      Tuesday
+2    Wednesday
+dtype: object
 """
