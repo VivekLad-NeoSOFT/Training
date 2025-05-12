@@ -1,8 +1,21 @@
 # Day-2
 
-## ETL using python
+## MySQL - Stored Procedure - [StoredProcedures.sql](stored_procedures.sql)
 
-- Extract data from API, files (csv,excel,json), and from MySQL database
-- Removed duplicates and null records from extracted data
-- Load cleaned data into files (csv,excel,json), and MySQL database
-- Generate reports based on data available in database
+- Simple SP
+- SP with parameters
+- SP with type casting
+- Drop a SP
+- Updating existing SP
+- List all SPs
+- See code of a SP
+
+## MySQL - View - [view.sql](view.sql)
+
+- Creating a view
+- Use of view
+- Updating a view (Dropping method)
+- Dropping a view
+- Updatable views\*
+- Check view definition
+- List all views
