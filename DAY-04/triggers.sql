@@ -8,7 +8,8 @@ The CREATE TRIGGER statement in MySQL is used to create a new trigger in the dat
 Syntax:
     CREATE TRIGGER trigger_name
     {BEFORE | AFTER} {INSERT | UPDATE | DELETE}
-    ON table_name FOR EACH ROW
+    ON table_name 
+    FOR EACH ROW
     BEGIN
         -- SQL statements
     END;
