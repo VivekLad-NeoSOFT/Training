@@ -2,7 +2,7 @@
 
 ## Spark Video Series - Theory
 
-- Video 5 to 11
+- Video 5 to 13
 
 ## Concepts learned
 
