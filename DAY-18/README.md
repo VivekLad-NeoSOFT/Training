@@ -3,3 +3,4 @@
 ## Linux
 
 - Soft & Hard links
+- Practical
