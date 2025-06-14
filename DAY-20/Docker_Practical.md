@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-- Latest version of Docker Desktop.
+- Latest version of Docker.
 - Git client
 - IDE or a text editor to edit files.
 
