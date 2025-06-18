@@ -4,3 +4,4 @@ py4j
 apache-airflow-providers-apache-spark==5.3.0
 flask_appbuilder
 pyarrow
+nsepython
