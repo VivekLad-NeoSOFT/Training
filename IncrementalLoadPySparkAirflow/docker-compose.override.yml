@@ -1,5 +1,21 @@
 # docker-compose.override.yml
 services:
+  mysql_source:
+    image: mysql:8.0
+    container_name: mysql_source
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: p@ssw0rd
+      MYSQL_DATABASE: sourcedb
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: p@ssw0rd
+    volumes:
+      - mysql-data:/var/lib/mysql
+    ports:
+      - "3308:3308"
+    networks:
+      - airflow
+
   spark-master:
     image: bitnami/spark:latest
     environment:
@@ -17,6 +33,7 @@ services:
       - ./include:/usr/local/airflow/include
       - ./apps:/opt/spark-apps
       - ./data:/opt/spark-data
+      - ./jars/mysql-connector-java-8.0.28.jar:/opt/bitnami/spark/jars/mysql-connector-java-8.0.28.jar
     networks:
       - airflow
 
@@ -36,10 +53,13 @@ services:
       - spark-data:/bitnami
       - ./apps:/opt/spark-apps
       - ./data:/opt/spark-data
+      - ./jars/mysql-connector-java-8.0.28.jar:/opt/bitnami/spark/jars/mysql-connector-java-8.0.28.jar
+
     depends_on:
       - spark-master
     networks:
       - airflow
 
 volumes:
+  mysql-data:
   spark-data:

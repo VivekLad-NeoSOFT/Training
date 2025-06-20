@@ -36,7 +36,7 @@ def niftyfifty_dag():
             return {'timestamp': '', 'data': []}
 
     @task.pyspark(conn_id='spark_conn')
-    def flatten_data(data: dict[str, Any]):
+    def transform(data: dict[str, Any]):
         flatten = []
         if data.get('timestamp') and data.get('data'):
             for row in data.get('data', {}):
@@ -74,41 +74,67 @@ def niftyfifty_dag():
         return flatten
 
     @task.pyspark(conn_id='spark_conn')
-    def transform(arr: list[dict], spark: SparkSession):
+    def load(arr: list[dict], spark: SparkSession):
+        spark = SparkSession.builder \
+            .master("spark://spark-master:7077") \
+            .config("spark.jars", "/usr/local/airflow/jars/mysql-connector-java-8.0.28.jar") \
+            .getOrCreate()
+
         schema = StructType([
-            StructField("symbol", StringType(), True),
-            StructField("identifier", StringType(), True),
-            StructField("open", DoubleType(), True),
-            StructField("dayHigh", DoubleType(), True),
-            StructField("dayLow", DoubleType(), True),
-            StructField("lastPrice", DoubleType(), True),
-            StructField("previousClose", DoubleType(), True),
-            StructField("change", DoubleType(), True),
-            StructField("pChange", DoubleType(), True),
-            StructField("totalTradedVolume", DoubleType(), True),
-            StructField("totalTradedValue", DoubleType(), True),
-            StructField("yearHigh", DoubleType(), True),
-            StructField("yearLow", DoubleType(), True),
-            StructField("companyName", StringType(), True),
-            StructField("industry", StringType(), True),
-            StructField("listingDate", DateType(), True),
+            StructField('symbol', StringType(), True),
+            StructField('identifier', StringType(), True),
+            StructField('open', DoubleType(), True),
+            StructField('dayHigh', DoubleType(), True),
+            StructField('dayLow', DoubleType(), True),
+            StructField('lastPrice', DoubleType(), True),
+            StructField('previousClose', DoubleType(), True),
+            StructField('change', DoubleType(), True),
+            StructField('pChange', DoubleType(), True),
+            StructField('totalTradedVolume', DoubleType(), True),
+            StructField('totalTradedValue', DoubleType(), True),
+            StructField('yearHigh', DoubleType(), True),
+            StructField('yearLow', DoubleType(), True),
+            StructField('companyName', StringType(), True),
+            StructField('industry', StringType(), True),
+            StructField('listingDate', DateType(), True),
             StructField(
-                "timestamp",
-                TimestampType(), True
+                'timestamp',
+                TimestampType(),
+                True
             ),
-            StructField("extracted_at", TimestampType(), True)
+            StructField('extracted_at', TimestampType(), True)
         ])
 
         df = spark.createDataFrame(arr, schema)
-        df.show()
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        output_path = f'file:///tmp/nifty_50_{timestamp}.parquet'
+        df.write.mode('overwrite').parquet(output_path)
+        print('Data loaded successfully into parquet.')
 
-    @task.pyspark(conn_id='spark_conn')
-    def load():
-        ...
+        # df.write\
+        #     .format('jdbc') \
+        #     .option('url', 'jdbc:mysql://mysql-source:3308/sourcedb') \
+        #     .option('driver', 'com.mysql.cj.jdbc.Driver') \
+        #     .option('dbtable', 'niftfifty') \
+        #     .option('user', 'root') \
+        #     .option('password', 'p@ssw0rd') \
+        #     .mode('overwrite') \
+        #     .save()
+
+        df.write.jdbc(
+            url='jdbc:mysql://mysql-source:3308/sourcedb',
+            table='niftfifty',
+            mode='append',
+            properties={
+                'user': 'admin',
+                'password': 'p@ssw0rd',
+                'driver': 'com.mysql.cj.jdbc.Driver'
+            }
+        )
 
     data = extract()
-    flatten_arr = flatten_data(data)
-    transform(flatten_arr)
+    flatten_arr = transform(data)
+    load(flatten_arr)
 
 
 niftyfifty_dag()
