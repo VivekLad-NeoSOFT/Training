@@ -1,0 +1,95 @@
+services:
+  mysql_source:
+    image: mysql:8.4.5
+    container_name: mysql_source_ec
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./mysql_init:/docker-entrypoint-initdb.d # For initial schema and data
+    ports:
+      - "3309:3309"
+
+  postgres_dw:
+    image: postgres:17.5
+    container_name: postgres_dw
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./postgres_init:/docker-entrypoint-initdb.d # For initial DWH schemas
+    ports:
+      - "5433:5433"
+
+  spark-master:
+    image: bitnami/spark:4.0.0
+    container_name: spark-master
+    environment:
+      - SPARK_MODE=master
+      - SPARK_RPC_AUTHENTICATION_ENABLED=no
+      - SPARK_RPC_ENCRYPTION_ENABLED=no
+      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
+      - SPARK_SSL_ENABLED=no
+    ports:
+      - "8080:8080" # Spark Master UI
+      - "7077:7077"
+    volumes:
+      - ./pyspark_apps:/opt/bitnami/spark/apps
+      - ./data_lake:/opt/ecommerce_data_lake # Mount data lake into Spark
+      - ./jars/mysql-connector-j-9.2.0.jar:/opt/bitnami/spark/jars/mysql-connector-j-9.2.0.jar
+
+  spark-worker:
+    image: bitnami/spark:4.0.0
+    container_name: spark-worker
+    depends_on:
+      - spark-master
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark-master:7077
+      - SPARK_WORKER_MEMORY=1G
+      - SPARK_WORKER_CORES=1
+      - SPARK_RPC_AUTHENTICATION_ENABLED=no
+      - SPARK_RPC_ENCRYPTION_ENABLED=no
+      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
+      - SPARK_SSL_ENABLED=no
+    volumes:
+      - ./pyspark_apps:/opt/bitnami/spark/apps
+      - ./data_lake:/opt/ecommerce_data_lake # Mount data lake into Spark
+      - ./jars/mysql-connector-j-9.2.0.jar:/opt/bitnami/spark/jars/mysql-connector-j-9.2.0.jar
+
+  airflow:
+    image: apache/airflow:3.0.2
+    container_name: airflow
+    restart: unless-stopped
+    depends_on:
+      - postgres_dw # Airflow can use Postgres for its metadata DB
+      - spark-master
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor # Or CeleryExecutor for production
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+      - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://dw_user:dw_password@postgres_dw:5433/airflow_metadata # Example: using a separate DB in postgres_dw for Airflow
+      # Add other Airflow configurations as needed
+    volumes:
+      - ./airflow_dags:/opt/airflow/dags
+      - ./airflow_logs:/opt/airflow/logs
+      - ./airflow_plugins:/opt/airflow/plugins
+      - ./pyspark_apps:/opt/pyspark_apps # So Airflow can submit PySpark jobs
+      - ./data_lake:/opt/ecommerce_data_lake # So Airflow operators can access paths
+    ports:
+      - "8081:8080" # Airflow Web UI
+    command: standalone # For simple setup, or use 'webserver' and 'scheduler' commands separately
+
+volumes:
+  mysql_data:
+  postgres_data:
+
+networks:
+  default:
+    name: ecommerce_network
