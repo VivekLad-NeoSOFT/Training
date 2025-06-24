@@ -1,7 +1,7 @@
 services:
   mysql_source:
     image: mysql:8.4.5
-    container_name: mysql_source_ec
+    container_name: mysql_source
     restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
@@ -12,7 +12,7 @@ services:
       - mysql_data:/var/lib/mysql
       - ./mysql_init:/docker-entrypoint-initdb.d # For initial schema and data
     ports:
-      - "3309:3309"
+      - "3309:3306"
 
   postgres_dw:
     image: postgres:17.5
@@ -26,7 +26,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - ./postgres_init:/docker-entrypoint-initdb.d # For initial DWH schemas
     ports:
-      - "5433:5433"
+      - "5433:5432"
 
   spark-master:
     image: bitnami/spark:4.0.0
@@ -37,6 +37,8 @@ services:
       - SPARK_RPC_ENCRYPTION_ENABLED=no
       - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
       - SPARK_SSL_ENABLED=no
+      # - HADOOP_SECURITY_AUTHENTICATION=simple
+      # - SPARK_USER=spark
     ports:
       - "8080:8080" # Spark Master UI
       - "7077:7077"
@@ -59,6 +61,8 @@ services:
       - SPARK_RPC_ENCRYPTION_ENABLED=no
       - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
       - SPARK_SSL_ENABLED=no
+      # - HADOOP_SECURITY_AUTHENTICATION=simple
+      # - SPARK_USER=spark
     volumes:
       - ./pyspark_apps:/opt/bitnami/spark/apps
       - ./data_lake:/opt/ecommerce_data_lake # Mount data lake into Spark

@@ -13,6 +13,7 @@ def ingest_table_to_bronze(
 ):
     """Ingests a MySQL table to the Bronze layer, partitioned by ingestion date."""
     print(f"Starting ingestion for table: {table_name}")
+    print(jdbc_url, table_name, connection_properties)
     try:
         df = spark.read.jdbc(
             url=jdbc_url,
@@ -27,14 +28,14 @@ def ingest_table_to_bronze(
         day = today.strftime("%d")
 
         output_path = f"{bronze_base_path}/mysql/{table_name}/{year}/{month}/{day}"
-
-        print(f"Writing data for {table_name} to: {output_path}")
-        df.write.mode("overwrite").parquet(output_path)
+        print(output_path)
+        print(f"Writing data from {table_name} to {output_path}")
+        df.show()
+        # df.write.mode('overwrite').parquet(output_path)
         print(f"Successfully ingested {table_name} to {output_path}")
 
     except Exception as e:
         print(f"Error ingesting table {table_name}: {e}")
-        raise
 
 
 if __name__ == "__main__":
@@ -48,8 +49,9 @@ if __name__ == "__main__":
     table_name_arg = sys.argv[4]
     bronze_base_path_arg = sys.argv[5]  # e.g., /opt/ecommerce_data_lake/bronze
 
-    spark = SparkSession.builder.appName(
-        f"BronzeIngestion_{table_name_arg}").getOrCreate()
+    spark = SparkSession.builder \
+        .appName(f"BronzeIngestion_{table_name_arg}") \
+        .getOrCreate()
 
     db_connection_properties = {
         "user": user_arg,
