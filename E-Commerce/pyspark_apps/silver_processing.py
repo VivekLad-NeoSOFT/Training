@@ -7,16 +7,16 @@ def process_orders_to_silver(
         spark: SparkSession,
         bronze_base_path: str,
         silver_base_path: str,
-        processing_date_str: str
+        processing_date: str
 ):
     """Cleans and transforms raw orders data to the Silver layer."""
-    year, month, day = processing_date_str.split('-')
+    year, month, day = processing_date.split('-')
     raw_orders_path = f"{bronze_base_path}/mysql/orders/{year}/{month}/{day}"
-    silver_orders_path = f"{silver_base_path}/orders_cleaned/processed_date={processing_date_str}"
+    silver_orders_path = f"{silver_base_path}/orders_cleaned/processed_date={processing_date}"
 
     print(f"Reading raw orders from: {raw_orders_path}")
     try:
-        df_orders = spark.read.parquet(raw_orders_path)
+        df_orders = spark.read.json(raw_orders_path)
 
         # Example Transformations:
         df_orders_cleaned = df_orders.withColumn("order_date", to_timestamp(col("order_date"))) \
@@ -55,17 +55,16 @@ if __name__ == "__main__":
         print("Usage: silver_processing.py <bronze_base_path> <silver_base_path> <processing_date YYYY-MM-DD>")
         sys.exit(-1)
 
-    bronze_path_arg = sys.argv[1]  # e.g., /opt/ecommerce_data_lake/bronze
-    silver_path_arg = sys.argv[2]  # e.g., /opt/ecommerce_data_lake/silver
+    bronze_path = sys.argv[1]  # e.g., /opt/ecommerce_data_lake/bronze
+    silver_path = sys.argv[2]  # e.g., /opt/ecommerce_data_lake/silver
     date_arg = sys.argv[3]        # e.g., {{ ds }} from Airflow
 
-    spark = SparkSession.builder.appName(
-        "SilverProcessing").getOrCreate()
+    spark = SparkSession.builder.appName("SilverProcessing").getOrCreate()
 
     process_orders_to_silver(
         spark,
-        bronze_path_arg,
-        silver_path_arg,
+        bronze_path,
+        silver_path,
         date_arg
     )
     # Call other processing functions here for customers, products etc.

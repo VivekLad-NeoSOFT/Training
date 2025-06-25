@@ -7,18 +7,18 @@ from datetime import datetime
 def ingest_table_to_bronze(
         spark: SparkSession,
         jdbc_url: str,
-        connection_properties: dict[str, Any],
+        db_con_props: dict[str, Any],
         table_name: str,
-        bronze_base_path: str
+        file_path: str
 ):
     """Ingests a MySQL table to the Bronze layer, partitioned by ingestion date."""
     print(f"Starting ingestion for table: {table_name}")
-    print(jdbc_url, table_name, connection_properties)
+    # print(jdbc_url, table_name, db_con_props)
     try:
         df = spark.read.jdbc(
             url=jdbc_url,
             table=table_name,
-            properties=connection_properties
+            properties=db_con_props
         )
 
         # Add ingestion date for partitioning
@@ -27,12 +27,12 @@ def ingest_table_to_bronze(
         month = today.strftime("%m")
         day = today.strftime("%d")
 
-        output_path = f"{bronze_base_path}/mysql/{table_name}/{year}/{month}/{day}"
-        print(output_path)
-        print(f"Writing data from {table_name} to {output_path}")
+        output_file = f"file://{file_path}/mysql/{table_name}/{year}/{month}/{day}"
+        # print(output_file)
+        # print(f"Writing data from {table_name} to {output_file}")
         df.show()
-        # df.write.mode('overwrite').parquet(output_path)
-        print(f"Successfully ingested {table_name} to {output_path}")
+        df.write.mode('overwrite').json(output_file)
+        print(f"Successfully ingested {table_name} to {output_file}")
 
     except Exception as e:
         print(f"Error ingesting table {table_name}: {e}")
@@ -40,22 +40,22 @@ def ingest_table_to_bronze(
 
 if __name__ == "__main__":
     if len(sys.argv) != 6:
-        print("Usage: bronze_ingestion.py <jdbc_url> <user> <password> <table_name> <bronze_base_path>")
+        print("Usage: bronze_ingestion.py <jdbc_url> <user> <password> <table_name> <file_path>")
         sys.exit(-1)
 
-    jdbc_url_arg = sys.argv[1]
+    jdbc_url = sys.argv[1]
     user_arg = sys.argv[2]
-    password_arg = sys.argv[3]
-    table_name_arg = sys.argv[4]
-    bronze_base_path_arg = sys.argv[5]  # e.g., /opt/ecommerce_data_lake/bronze
+    password = sys.argv[3]
+    table_name = sys.argv[4]
+    path = sys.argv[5]  # e.g., /opt/ecommerce_data_lake/bronze
 
     spark = SparkSession.builder \
-        .appName(f"BronzeIngestion_{table_name_arg}") \
+        .appName(f"BronzeIngestion_{table_name}") \
         .getOrCreate()
 
-    db_connection_properties = {
+    db_con_props = {
         "user": user_arg,
-        "password": password_arg,
+        "password": password,
         # Ensure MySQL JDBC driver is available to Spark
         "driver": "com.mysql.cj.jdbc.Driver"
     }
@@ -66,10 +66,10 @@ if __name__ == "__main__":
 
     ingest_table_to_bronze(
         spark,
-        jdbc_url_arg,
-        db_connection_properties,
-        table_name_arg,
-        bronze_base_path_arg
+        jdbc_url,
+        db_con_props,
+        table_name,
+        path
     )
 
     spark.stop()

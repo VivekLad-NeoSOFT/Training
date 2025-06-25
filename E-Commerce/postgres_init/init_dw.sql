@@ -1,5 +1,5 @@
 CREATE DATABASE airflow_metadata;
-GRANT ALL PRIVILEGES ON DATABASE airflow_metadata TO dw_user;
+GRANT ALL PRIVILEGES ON DATABASE airflow_metadata TO admin;
 
 -- Create schemas
 CREATE SCHEMA IF NOT EXISTS dimensions;

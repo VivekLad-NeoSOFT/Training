@@ -1,6 +1,6 @@
 -- mysql_init/init.sql
-CREATE DATABASE IF NOT EXISTS ecommerce_daily_db;
-USE ecommerce_daily_db;
+CREATE DATABASE IF NOT EXISTS ecommerce_daily;
+USE ecommerce_daily;
 
 CREATE TABLE IF NOT EXISTS customers (
     customer_id INT AUTO_INCREMENT PRIMARY KEY,
