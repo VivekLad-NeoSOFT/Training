@@ -11,8 +11,8 @@ def ingest_table_to_bronze(
         table_name: str,
         file_path: str
 ):
-    """Ingests a MySQL table to the Bronze layer, partitioned by ingestion date."""
-    print(f"Starting ingestion for table: {table_name}")
+    '''Ingests a MySQL table to the Bronze layer, partitioned by ingestion date.'''
+    print(f'Starting ingestion for table: {table_name}')
     # print(jdbc_url, table_name, db_con_props)
     try:
         df = spark.read.jdbc(
@@ -23,24 +23,24 @@ def ingest_table_to_bronze(
 
         # Add ingestion date for partitioning
         today = datetime.today()
-        year = today.strftime("%Y")
-        month = today.strftime("%m")
-        day = today.strftime("%d")
+        year = today.strftime('%Y')
+        month = today.strftime('%m')
+        day = today.strftime('%d')
 
-        output_file = f"file://{file_path}/mysql/{table_name}/{year}/{month}/{day}"
+        output_file = f'file://{file_path}/mysql/{table_name}/{year}/{month}/{day}'
         # print(output_file)
-        # print(f"Writing data from {table_name} to {output_file}")
+        # print(f'Writing data from {table_name} to {output_file}')
         df.show()
         df.write.mode('overwrite').json(output_file)
-        print(f"Successfully ingested {table_name} to {output_file}")
+        print(f'Successfully ingested {table_name} to {output_file}')
 
     except Exception as e:
-        print(f"Error ingesting table {table_name}: {e}")
+        print(f'Error ingesting table {table_name}: {e}')
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     if len(sys.argv) != 6:
-        print("Usage: bronze_ingestion.py <jdbc_url> <user> <password> <table_name> <file_path>")
+        print('Usage: bronze_ingestion.py <jdbc_url> <user> <password> <table_name> <file_path>')
         sys.exit(-1)
 
     jdbc_url = sys.argv[1]
@@ -50,14 +50,14 @@ if __name__ == "__main__":
     path = sys.argv[5]  # e.g., /opt/ecommerce_data_lake/bronze
 
     spark = SparkSession.builder \
-        .appName(f"BronzeIngestion_{table_name}") \
+        .appName(f'BronzeIngestion_{table_name}') \
         .getOrCreate()
 
     db_con_props = {
-        "user": user_arg,
-        "password": password,
+        'user': user_arg,
+        'password': password,
         # Ensure MySQL JDBC driver is available to Spark
-        "driver": "com.mysql.cj.jdbc.Driver"
+        'driver': 'com.mysql.cj.jdbc.Driver'
     }
 
     # You might need to add the MySQL JDBC driver to Spark's jars.
