@@ -4,7 +4,7 @@ sudo docker exec spark-master spark-submit --master spark://spark-master:7077 /o
 sudo docker exec spark-master spark-submit --master spark://spark-master:7077 /opt/bitnami/spark/apps/bronze_ingestion.py jdbc:mysql://mysql_source:3306/ecommerce_daily admin p@ssw0rd orders /opt/ecommerce_data_lake/bronze
 
 -- Silver processing
-sudo docker exec spark-master spark-submit --master spark://spark-master:7077 /opt/bitnami/spark/apps/silver_processing.py /opt/ecommerce_data_lake/bronze  /opt/ecommerce_data_lake/silver '2025-06-26'
+sudo docker exec spark-master spark-submit --master spark://spark-master:7077 /opt/bitnami/spark/apps/silver_processing.py /opt/ecommerce_data_lake/bronze  /opt/ecommerce_data_lake/silver '2025-06-27'
 
-
-sudo docker exec spark-master spark-submit --master spark://spark-master:7077 /opt/bitnami/spark/apps/gold_aggregation.py /opt/ecommerce_data_lake/silver  /opt/ecommerce_data_lake/gold '2025-06-26'
+-- Gold aggregation
+sudo docker exec spark-master spark-submit --master spark://spark-master:7077 /opt/bitnami/spark/apps/gold_aggregation.py /opt/ecommerce_data_lake/silver  /opt/ecommerce_data_lake/gold '2025-06-27'

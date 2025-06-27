@@ -18,8 +18,8 @@ def create_daily_sales_summary(
         processing_date: str
 ):
     '''Aggregates daily sales summary from Silver data.'''
-    silver_orders_path = f'{silver_base_path}/orders_cleaned/processed_date={processing_date}'
-    gold_sales_summary_path = f'{gold_base_path}/sales_daily_summary/report_date={processing_date}'
+    silver_orders_path = f'{silver_base_path}/orders_cleaned/{processing_date}'
+    gold_sales_summary_path = f'{gold_base_path}/sales_daily_summary/{processing_date}'
 
     schema = StructType([
         StructField('order_id', IntegerType(), True),
@@ -32,10 +32,13 @@ def create_daily_sales_summary(
     print(f'Reading cleaned orders from: {silver_orders_path}')
     try:
         df_orders_silver = spark.read.json(silver_orders_path, schema=schema)
+        df_orders_silver.show()
 
         # Filter for 'completed' or 'shipped' orders for sales summary
         df_sales = df_orders_silver.filter(
-            col('order_status').isin(['delivered', 'shipped', 'pending']))
+            col('order_status').isin(['delivered', 'shipped']))
+
+        df_sales.show()
 
         df_daily_summary = df_sales.groupBy(date_format('order_date', 'yyyy-MM-dd').alias('sale_date')) \
             .agg(

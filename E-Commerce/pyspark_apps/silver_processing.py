@@ -20,7 +20,9 @@ def process_orders_to_silver(
     '''Cleans and transforms raw orders data to the Silver layer.'''
     year, month, day = processing_date.split('-')
     raw_orders_path = f'{bronze_base_path}/mysql/orders/{year}/{month}/{day}'
-    silver_orders_path = f'{silver_base_path}/orders_cleaned/processed_date={processing_date}'
+    silver_orders_path = f'{silver_base_path}/orders_cleaned/{processing_date}'
+    print('raw_orders_path:-->', raw_orders_path)
+    print('silver_orders_path:-->', silver_orders_path)
 
     print(f'Reading raw orders from: {raw_orders_path}')
     schema = StructType([
@@ -33,6 +35,7 @@ def process_orders_to_silver(
     ])
     try:
         df_orders = spark.read.json(raw_orders_path, schema=schema)
+        df_orders.show()
 
         # Example Transformations:
         df_orders_cleaned = df_orders.withColumn('order_date', to_timestamp(col('order_date'))) \
@@ -51,6 +54,7 @@ def process_orders_to_silver(
             col('total_amount'),
             col('order_status'),
         )
+        df_orders_silver.show()
 
         print(f'Writing cleaned orders to: {silver_orders_path}')
         df_orders_silver.write.mode('overwrite').json(silver_orders_path)
