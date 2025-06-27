@@ -48,6 +48,7 @@ services:
       - ./pyspark_apps:/opt/bitnami/spark/apps
       - ./data_lake:/opt/ecommerce_data_lake # Mount data lake into Spark
       - ./jars/mysql-connector-j-9.2.0.jar:/opt/bitnami/spark/jars/mysql-connector-j-9.2.0.jar
+      - ./jars/postgresql-42.7.7.jar:/opt/bitnami/spark/jars/postgresql-42.7.7.jar
 
   spark-worker:
     container_name: spark-worker
@@ -71,6 +72,7 @@ services:
       - ./pyspark_apps:/opt/bitnami/spark/apps
       - ./data_lake:/opt/ecommerce_data_lake # Mount data lake into Spark
       - ./jars/mysql-connector-j-9.2.0.jar:/opt/bitnami/spark/jars/mysql-connector-j-9.2.0.jar
+      - ./jars/postgresql-42.7.7.jar:/opt/bitnami/spark/jars/postgresql-42.7.7.jar
 
   airflow:
     image: apache/airflow:3.0.2

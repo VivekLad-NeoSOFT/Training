@@ -5,7 +5,6 @@ GRANT ALL PRIVILEGES ON DATABASE airflow_metadata TO admin;
 CREATE SCHEMA IF NOT EXISTS dimensions;
 CREATE SCHEMA IF NOT EXISTS facts;
 
-
 -- Dimension: Customer
 
 CREATE TABLE IF NOT EXISTS dimensions.dim_customer (
@@ -53,4 +52,11 @@ CREATE TABLE IF NOT EXISTS facts.fact_orders (
     order_date DATE,
     FOREIGN KEY (customer_sk) REFERENCES dimensions.dim_customer(customer_sk),
     FOREIGN KEY (product_sk) REFERENCES dimensions.dim_product(product_sk)
+);
+
+CREATE TABLE IF NOT EXISTS facts.fact_sales_summary (
+    sale_date DATE PRIMARY KEY,
+    total_revenue NUMERIC(12, 2),
+    total_orders INT,
+    average_order_value NUMERIC(12, 2)
 );
