@@ -1,4 +1,3 @@
--- mysql_init/init.sql
 CREATE DATABASE IF NOT EXISTS ecommerce_daily;
 USE ecommerce_daily;
 

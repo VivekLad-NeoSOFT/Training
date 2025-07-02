@@ -34,7 +34,6 @@ def create_daily_sales_summary(
         df_orders_silver = spark.read.json(silver_orders_path, schema=schema)
         df_orders_silver.show()
 
-        # Filter for 'completed' or 'shipped' orders for sales summary
         df_sales = df_orders_silver.filter(
             col('order_status').isin(['delivered', 'shipped']))
 
@@ -58,7 +57,6 @@ def create_daily_sales_summary(
 
     except Exception as e:
         print(f'Error creating daily sales summary: {e}')
-    # Add other gold table creation functions, e.g., customer segmentation, product performance
 
 
 if __name__ == '__main__':
@@ -66,9 +64,9 @@ if __name__ == '__main__':
         print('Usage: gold_aggregation.py <silver_base_path> <gold_base_path> <processing_date YYYY-MM-DD>')
         sys.exit(-1)
 
-    silver_path = sys.argv[1]  # e.g., /opt/data_lake/silver
-    gold_path = sys.argv[2]   # e.g., /opt/data_lake/gold
-    date = sys.argv[3]        # e.g., {{ ds }} from Airflow
+    silver_path = sys.argv[1]
+    gold_path = sys.argv[2]
+    date = sys.argv[3]
 
     spark = SparkSession.builder.appName('GoldAggregation').getOrCreate()
 
@@ -78,6 +76,5 @@ if __name__ == '__main__':
         gold_path,
         date
     )
-    # Call other gold aggregation functions
 
     spark.stop()

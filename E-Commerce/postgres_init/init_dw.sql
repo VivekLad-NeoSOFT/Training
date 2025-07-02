@@ -1,15 +1,13 @@
 CREATE DATABASE airflow_metadata;
 GRANT ALL PRIVILEGES ON DATABASE airflow_metadata TO admin;
 
--- Create schemas
 CREATE SCHEMA IF NOT EXISTS dimensions;
 CREATE SCHEMA IF NOT EXISTS facts;
 
--- Dimension: Customer
 
 CREATE TABLE IF NOT EXISTS dimensions.dim_customer (
-    customer_sk SERIAL PRIMARY KEY,       -- Surrogate Key
-    customer_id INT,                      -- Natural Key from source
+    customer_sk SERIAL PRIMARY KEY,      
+    customer_id INT,                      
     first_name VARCHAR(50),
     last_name VARCHAR(50),
     email VARCHAR(50),
@@ -20,12 +18,10 @@ CREATE TABLE IF NOT EXISTS dimensions.dim_customer (
     date_of_birth DATE,
     created_at TIMESTAMP,
     effective_from TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    effective_to TIMESTAMP,               -- For slowly changing dimensions if needed
-    is_current BOOLEAN DEFAULT TRUE       -- Optional for SCD Type 2
+    effective_to TIMESTAMP,               
+    is_current BOOLEAN DEFAULT TRUE       
 );
 
-
--- Dimension: Product
 
 CREATE TABLE IF NOT EXISTS dimensions.dim_product (
     product_sk SERIAL PRIMARY KEY,
@@ -40,9 +36,6 @@ CREATE TABLE IF NOT EXISTS dimensions.dim_product (
     effective_to TIMESTAMP,
     is_current BOOLEAN DEFAULT TRUE
 );
-
-
--- Fact: Orders
 
 CREATE TABLE IF NOT EXISTS facts.fact_orders (
     order_sk SERIAL PRIMARY KEY,

@@ -21,8 +21,6 @@ def process_orders_to_silver(
     year, month, day = processing_date.split('-')
     raw_orders_path = f'{bronze_base_path}/mysql/orders/{year}/{month}/{day}'
     silver_orders_path = f'{silver_base_path}/orders_cleaned/{processing_date}'
-    print('raw_orders_path:-->', raw_orders_path)
-    print('silver_orders_path:-->', silver_orders_path)
 
     print(f'Reading raw orders from: {raw_orders_path}')
     schema = StructType([
@@ -37,15 +35,9 @@ def process_orders_to_silver(
         df_orders = spark.read.json(raw_orders_path, schema=schema)
         df_orders.show()
 
-        # Example Transformations:
         df_orders_cleaned = df_orders.withColumn('order_date', to_timestamp(col('order_date'))) \
                                      .withColumn('total_amount', col('total_amount').cast('decimal(10,2)'))
 
-        # Handle missing values (example: fill 'shipping_address' with 'N/A')
-        # df_orders_cleaned = df_orders_cleaned.fillna(
-        #     {'shipping_address': 'N/A'})
-
-        # Schema Enforcement (select and cast)
         df_orders_silver = df_orders_cleaned.select(
             col('order_id').cast('int'),
             col('customer_id').cast('int'),
@@ -64,18 +56,15 @@ def process_orders_to_silver(
         print(f'Error processing orders to Silver: {e}')
         raise
 
-# Add similar functions for customers (e.g., process_customers_to_silver)
-# and products (e.g., process_products_to_silver)
-
 
 if __name__ == '__main__':
     if len(sys.argv) != 4:
         print('Usage: silver_processing.py <bronze_base_path> <silver_base_path> <processing_date YYYY-MM-DD>')
         sys.exit(-1)
 
-    bronze_path = sys.argv[1]  # e.g., /opt/data_lake/bronze
-    silver_path = sys.argv[2]  # e.g., /opt/data_lake/silver
-    date_arg = sys.argv[3]        # e.g., {{ ds }} from Airflow
+    bronze_path = sys.argv[1]
+    silver_path = sys.argv[2]
+    date_arg = sys.argv[3]
 
     spark = SparkSession.builder.appName('SilverProcessing').getOrCreate()
 
@@ -85,6 +74,5 @@ if __name__ == '__main__':
         silver_path,
         date_arg
     )
-    # Call other processing functions here for customers, products etc.
 
     spark.stop()

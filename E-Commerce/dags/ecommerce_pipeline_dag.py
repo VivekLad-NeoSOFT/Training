@@ -31,8 +31,6 @@ MYSQL_TABLES = ['orders', 'customers', 'products']
     tags=['ecommerce', 'medallion']
 )
 def ecommerce_data_pipeline():
-    # Dynamically generate SparkSubmitOperator tasks (Bronze Layer)
-    # /opt/bitnami/spark/apps/bronze_ingestion.py jdbc:mysql://mysql_source:3306/ecommerce_daily admin p@ssw0rd customers /opt/data_lake/bronze
     bronze_tasks = []
     for table in MYSQL_TABLES:
         bronze_task = SparkSubmitOperator(
