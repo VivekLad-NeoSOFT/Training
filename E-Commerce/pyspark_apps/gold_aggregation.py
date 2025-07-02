@@ -66,8 +66,8 @@ if __name__ == '__main__':
         print('Usage: gold_aggregation.py <silver_base_path> <gold_base_path> <processing_date YYYY-MM-DD>')
         sys.exit(-1)
 
-    silver_path = sys.argv[1]  # e.g., /opt/ecommerce_data_lake/silver
-    gold_path = sys.argv[2]   # e.g., /opt/ecommerce_data_lake/gold
+    silver_path = sys.argv[1]  # e.g., /opt/data_lake/silver
+    gold_path = sys.argv[2]   # e.g., /opt/data_lake/gold
     date = sys.argv[3]        # e.g., {{ ds }} from Airflow
 
     spark = SparkSession.builder.appName('GoldAggregation').getOrCreate()

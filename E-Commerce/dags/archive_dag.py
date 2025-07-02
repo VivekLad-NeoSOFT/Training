@@ -13,8 +13,8 @@
 # # (Paste the archive_old_bronze_data function definition from Step 8 here)
 
 
-# ARCHIVE_BASE_PATH = '/opt/ecommerce_data_lake/archive'
-# BRONZE_BASE_PATH = '/opt/ecommerce_data_lake/bronze'
+# ARCHIVE_BASE_PATH = '/opt/data_lake/archive'
+# BRONZE_BASE_PATH = '/opt/data_lake/bronze'
 # RETENTION_DAYS_BRONZE = 365  # Archive Bronze data older than 1 year
 
 # default_args_archive = {

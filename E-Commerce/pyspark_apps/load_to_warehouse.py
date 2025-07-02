@@ -35,7 +35,7 @@ if __name__ == '__main__':
         print('Usage: load_to_warehouse.py <gold_data_path> <jdbc_url_psql> <user> <password> <target_schema.target_table> <processing_date YYYY-MM-DD>')
         sys.exit(-1)
 
-    # e.g., /opt/ecommerce_data_lake/gold/sales_daily_summary/<date:str>
+    # e.g., /opt/data_lake/gold/sales_daily_summary/<date:str>
     gold_data_path = sys.argv[1]
 
     # e.g., jdbc:postgresql://postgres_dw:5432/ecommerce_warehouse

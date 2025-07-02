@@ -7,6 +7,6 @@ RUN apt update && \
 ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
 ENV PATH="$JAVA_HOME/bin:$PATH"
 
-COPY deps.txt /requirements.txt
 USER airflow
+COPY deps.txt /requirements.txt
 RUN pip install --no-cache-dir -r /requirements.txt

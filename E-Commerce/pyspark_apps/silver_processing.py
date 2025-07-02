@@ -73,8 +73,8 @@ if __name__ == '__main__':
         print('Usage: silver_processing.py <bronze_base_path> <silver_base_path> <processing_date YYYY-MM-DD>')
         sys.exit(-1)
 
-    bronze_path = sys.argv[1]  # e.g., /opt/ecommerce_data_lake/bronze
-    silver_path = sys.argv[2]  # e.g., /opt/ecommerce_data_lake/silver
+    bronze_path = sys.argv[1]  # e.g., /opt/data_lake/bronze
+    silver_path = sys.argv[2]  # e.g., /opt/data_lake/silver
     date_arg = sys.argv[3]        # e.g., {{ ds }} from Airflow
 
     spark = SparkSession.builder.appName('SilverProcessing').getOrCreate()

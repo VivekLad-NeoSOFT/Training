@@ -54,10 +54,10 @@ x-airflow-common: &airflow-common
     - ${AIRFLOW_PROJ_DIR:-.}/config:/opt/airflow/config
     - ${AIRFLOW_PROJ_DIR:-.}/plugins:/opt/airflow/plugins
     - ./pyspark_apps:/opt/pyspark_apps
-    - ./data_lake:/opt/ecommerce_data_lake
+    - ./data_lake:/opt/data_lake
     - ./jars/mysql-connector-j-9.2.0.jar:/opt/bitnami/spark/jars/mysql-connector-j-9.2.0.jar
     - ./jars/postgresql-42.7.7.jar:/opt/bitnami/spark/jars/postgresql-42.7.7.jar
-  user: "${AIRFLOW_UID:-1000}:0"
+  user: "${AIRFLOW_UID:-50000}:0"
   depends_on: &airflow-common-depends-on
     postgres:
       condition: service_healthy
@@ -83,12 +83,11 @@ services:
       - ecommerce_network
 
   spark-master:
+    image: bitnami/spark:4.0.0
     container_name: spark-master
-    build:
-      context: .
-      dockerfile: spark.Dockerfile
-    entrypoint: ["/opt/bitnami/scripts/spark/entrypoint.sh"]
-    command: ["bash", "-c", "/opt/bitnami/scripts/spark/run.sh"]
+    # entrypoint: ["/opt/bitnami/scripts/spark/entrypoint.sh"]
+    # command: ["bash", "-c", "/opt/bitnami/scripts/spark/run.sh"]
+    user: root
     environment:
       - SPARK_MODE=master
       - SPARK_RPC_AUTHENTICATION_ENABLED=no
@@ -100,19 +99,18 @@ services:
       - "7077:7077"
     volumes:
       - ./pyspark_apps:/opt/bitnami/spark/apps
-      - ./data_lake:/opt/ecommerce_data_lake
+      - ./data_lake:/opt/data_lake
       - ./jars/mysql-connector-j-9.2.0.jar:/opt/bitnami/spark/jars/mysql-connector-j-9.2.0.jar
       - ./jars/postgresql-42.7.7.jar:/opt/bitnami/spark/jars/postgresql-42.7.7.jar
     networks:
       - ecommerce_network
 
   spark-worker:
+    image: bitnami/spark:4.0.0
     container_name: spark-worker
-    build:
-      context: .
-      dockerfile: spark.Dockerfile
-    entrypoint: ["/opt/bitnami/scripts/spark/entrypoint.sh"]
-    command: ["bash", "-c", "/opt/bitnami/scripts/spark/run.sh"]
+    # entrypoint: ["/opt/bitnami/scripts/spark/entrypoint.sh"]
+    # command: ["bash", "-c", "/opt/bitnami/scripts/spark/run.sh"]
+    user: root
     depends_on:
       - spark-master
     environment:
@@ -126,7 +124,7 @@ services:
       - SPARK_SSL_ENABLED=no
     volumes:
       - ./pyspark_apps:/opt/bitnami/spark/apps
-      - ./data_lake:/opt/ecommerce_data_lake
+      - ./data_lake:/opt/data_lake
       - ./jars/mysql-connector-j-9.2.0.jar:/opt/bitnami/spark/jars/mysql-connector-j-9.2.0.jar
       - ./jars/postgresql-42.7.7.jar:/opt/bitnami/spark/jars/postgresql-42.7.7.jar
     networks:
@@ -325,7 +323,7 @@ services:
       _AIRFLOW_WWW_USER_USERNAME: ${_AIRFLOW_WWW_USER_USERNAME:-airflow}
       _AIRFLOW_WWW_USER_PASSWORD: ${_AIRFLOW_WWW_USER_PASSWORD:-airflow}
       _PIP_ADDITIONAL_REQUIREMENTS: ""
-    user: "airflow"
+    user: "0:0"
 
   airflow-cli:
     <<: *airflow-common

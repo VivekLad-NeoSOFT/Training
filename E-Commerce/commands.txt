@@ -1,14 +1,14 @@
 -- Bronze ingestionronze
-sudo docker exec spark-master spark-submit --master spark://spark-master:7077 /opt/bitnami/spark/apps/bronze_ingestion.py jdbc:mysql://mysql_source:3306/ecommerce_daily admin p@ssw0rd customers /opt/ecommerce_data_lake/bronze
-sudo docker exec spark-master spark-submit --master spark://spark-master:7077 /opt/bitnami/spark/apps/bronze_ingestion.py jdbc:mysql://mysql_source:3306/ecommerce_daily admin p@ssw0rd products /opt/ecommerce_data_lake/bronze
-sudo docker exec spark-master spark-submit --master spark://spark-master:7077 /opt/bitnami/spark/apps/bronze_ingestion.py jdbc:mysql://mysql_source:3306/ecommerce_daily admin p@ssw0rd orders /opt/ecommerce_data_lake/bronze
+sudo docker exec spark-master spark-submit --master spark://spark-master:7077 /opt/bitnami/spark/apps/bronze_ingestion.py jdbc:mysql://mysql_source:3306/ecommerce_daily admin p@ssw0rd customers /opt/data_lake/bronze
+sudo docker exec spark-master spark-submit --master spark://spark-master:7077 /opt/bitnami/spark/apps/bronze_ingestion.py jdbc:mysql://mysql_source:3306/ecommerce_daily admin p@ssw0rd products /opt/data_lake/bronze
+sudo docker exec spark-master spark-submit --master spark://spark-master:7077 /opt/bitnami/spark/apps/bronze_ingestion.py jdbc:mysql://mysql_source:3306/ecommerce_daily admin p@ssw0rd orders /opt/data_lake/bronze
 
 -- Silver processing
-sudo docker exec spark-master spark-submit --master spark://spark-master:7077 /opt/bitnami/spark/apps/silver_processing.py /opt/ecommerce_data_lake/bronze  /opt/ecommerce_data_lake/silver '2025-06-30'
+sudo docker exec spark-master spark-submit --master spark://spark-master:7077 /opt/bitnami/spark/apps/silver_processing.py /opt/data_lake/bronze  /opt/data_lake/silver '2025-06-30'
 
 -- Gold aggregation
-sudo docker exec spark-master spark-submit --master spark://spark-master:7077 /opt/bitnami/spark/apps/gold_aggregation.py /opt/ecommerce_data_lake/silver  /opt/ecommerce_data_lake/gold '2025-06-30'
+sudo docker exec spark-master spark-submit --master spark://spark-master:7077 /opt/bitnami/spark/apps/gold_aggregation.py /opt/data_lake/silver  /opt/data_lake/gold '2025-06-30'
 
 
 -- Data warehouse
-sudo docker exec spark-master spark-submit --master spark://spark-master:7077 /opt/bitnami/spark/apps/load_to_warehouse.py /opt/ecommerce_data_lake/gold/sales_daily_summary/2025-06-30 jdbc:postgresql://postgres_dw:5432/ecommerce_warehouse admin p@ssw0rd facts.fact_sales_summary 2025-06-30
+sudo docker exec spark-master spark-submit --master spark://spark-master:7077 /opt/bitnami/spark/apps/load_to_warehouse.py /opt/data_lake/gold/sales_daily_summary/2025-06-30 jdbc:postgresql://postgres_dw:5432/ecommerce_warehouse admin p@ssw0rd facts.fact_sales_summary 2025-06-30

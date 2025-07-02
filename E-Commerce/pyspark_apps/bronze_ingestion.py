@@ -31,7 +31,7 @@ def ingest_table_to_bronze(
         # print(output_file)
         # print(f'Writing data from {table_name} to {output_file}')
         df.show()
-        df.write.mode('overwrite').json(output_file)
+        df.write.mode('overwrite').format('json').save(output_file)
         print(f'Successfully ingested {table_name} to {output_file}')
 
     except Exception as e:
@@ -47,7 +47,7 @@ if __name__ == '__main__':
     user_arg = sys.argv[2]
     password = sys.argv[3]
     table_name = sys.argv[4]
-    path = sys.argv[5]  # e.g., /opt/ecommerce_data_lake/bronze
+    path = sys.argv[5]  # e.g., /opt/data_lake/bronze
 
     spark = SparkSession.builder \
         .appName(f'BronzeIngestion_{table_name}') \
