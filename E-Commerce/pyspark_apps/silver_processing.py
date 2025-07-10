@@ -19,7 +19,7 @@ def process_orders_to_silver(
 ):
     '''Cleans and transforms raw orders data to the Silver layer.'''
     year, month, day = processing_date.split('-')
-    raw_orders_path = f'{bronze_base_path}/mysql/orders/{year}/{month}/{day}'
+    raw_orders_path = f'{bronze_base_path}/mysql/orders/{year}-{month}-{day}'
     silver_orders_path = f'{silver_base_path}/orders_cleaned/{processing_date}'
 
     print(f'Reading raw orders from: {raw_orders_path}')

@@ -24,7 +24,7 @@ def ingest_table_to_bronze(
         month = today.strftime('%m')
         day = today.strftime('%d')
 
-        output_file = f'{file_path}/mysql/{table_name}/{year}/{month}/{day}'
+        output_file = f'{file_path}/mysql/{table_name}/{year}-{month}-{day}'
         df.show()
         df.write.mode('overwrite').format('json').save(output_file)
         print(f'Successfully ingested {table_name} to {output_file}')

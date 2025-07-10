@@ -1,67 +1,111 @@
-# from airflow.sdk import DAG
-# from airflow.providers.standard.operators.python import PythonOperator
-# from airflow.providers.standard.operators.empty import EmptyOperator
-# from datetime import datetime, timedelta
-# from helper.archive import archive_old_bronze_data
+from datetime import datetime, timedelta
+import shutil
+import os
 
-# # Import your archive function (assuming it's in a place Python can find, e.g., plugins or dags folder)
-# # For this example, let's assume archive_old_bronze_data is defined in this file or imported correctly.
-# # from your_archive_module import archive_old_bronze_data (if it's in a separate module)
-
-# # Re-define or import the archive_old_bronze_data function here if not imported
-# import os
-# # (Paste the archive_old_bronze_data function definition from Step 8 here)
+from airflow.sdk import dag
+from airflow.providers.standard.operators.python import PythonOperator
 
 
-# ARCHIVE_BASE_PATH = '/opt/data_lake/archive'
-# BRONZE_BASE_PATH = '/opt/data_lake/bronze'
-# RETENTION_DAYS_BRONZE = 365  # Archive Bronze data older than 1 year
+def archive_old_data(
+        base_path: str,
+        archive_path: str,
+        retention_days: int,
+        table_name: str,
+        include_mysql=True
+):
+    '''Archives data older than retention_days for a given table.'''
+    if include_mysql:
+        source_table_path = os.path.join(base_path, 'mysql', table_name)
+        archive_table_path = os.path.join(archive_path, 'mysql', table_name)
+    else:
+        source_table_path = os.path.join(base_path, table_name)
+        archive_table_path = os.path.join(archive_path, table_name)
 
-# default_args_archive = {
-#     'owner': 'airflow',
-#     'depends_on_past': False,
-#     'email_on_failure': False,
-#     'start_date': datetime(2024, 1, 1),
-#     'retries': 1,
-#     'retry_delay': timedelta(minutes=5),
-# }
+    os.makedirs(archive_table_path, exist_ok=True)
+    cutoff_date = datetime.now() - timedelta(days=retention_days)
 
-# with DAG(
-#     dag_id='data_archival_pipeline',
-#     default_args=default_args_archive,
-#     description='Monthly Data Archival for Bronze Tier',
-#     schedule='@monthly',  # Run monthly
-#     catchup=False,
-#     tags=['ecommerce', 'archive'],
-# ) as archive_dag:
+    for partition_dir in os.listdir(source_table_path):
+        partition_path = os.path.join(source_table_path, partition_dir)
+        if not os.path.isdir(partition_path):
+            continue
 
-#     start_archive = EmptyOperator(task_id='start_archival')
+        partition_date = datetime.strptime(
+            partition_dir.split('/')[-1],
+            '%Y-%m-%d'
+        )
 
-#     archive_bronze_orders_task = PythonOperator(
-#         task_id='archive_bronze_orders',
-#         python_callable=archive_old_bronze_data,
-#         op_kwargs={
-#             'base_bronze_path': BRONZE_BASE_PATH,
-#             'archive_bronze_path': os.path.join(ARCHIVE_BASE_PATH, 'bronze'),
-#             'retention_days': RETENTION_DAYS_BRONZE,
-#             'table_name': 'orders'
-#         }
-#     )
+        # Check if this date is old enough to archive
+        if partition_date <= cutoff_date:
+            dest_path = os.path.join(archive_table_path, partition_dir)
 
-#     archive_bronze_customers_task = PythonOperator(
-#         task_id='archive_bronze_customers',
-#         python_callable=archive_old_bronze_data,
-#         op_kwargs={
-#             'base_bronze_path': BRONZE_BASE_PATH,
-#             'archive_bronze_path': os.path.join(ARCHIVE_BASE_PATH, 'bronze'),
-#             'retention_days': RETENTION_DAYS_BRONZE,
-#             'table_name': 'customers'
-#         }
-#     )
+            # Clean up existing archive path if it exists
+            if os.path.exists(dest_path):
+                print(f'Removing existing archive folder: {dest_path}')
+                shutil.rmtree(dest_path)
 
-#     # Add tasks for other tables or tiers (Silver, Gold) if needed
+            print(f'Archiving {partition_path} -> {dest_path}')
+            shutil.move(partition_path, dest_path)
 
-#     end_archive = EmptyOperator(task_id='end_archival')
+            # Extra cleanup if source still exists
+            if os.path.exists(partition_path):
+                print(f'Force removing leftover path: {partition_path}')
+                shutil.rmtree(partition_path)
 
-#     start_archive >> [archive_bronze_orders_task,
-#                       archive_bronze_customers_task] >> end_archive
+    print(f'Archiving completed for {table_name}.')
+
+
+ARCHIVE_BASE_PATH = '/opt/data_lake/archive'
+BRONZE_BASE_PATH = '/opt/data_lake/bronze'
+SILVER_BASE_PATH = '/opt/data_lake/silver'
+GOLD_BASE_PATH = '/opt/data_lake/gold'
+MYSQL_TABLES = ['orders', 'customers', 'products']
+
+RETENTION_DAYS_BRONZE = 0
+RETENTION_DAYS_SILVER = 0
+RETENTION_DAYS_GOLD = 0
+
+
+@dag(
+    dag_id='ecommerce_data_archival',
+    default_args={'owner': 'airflow', 'depends_on_past': False},
+    description='Daily Data Archival',
+    # schedule='@daily',
+    schedule=None,
+    start_date=datetime(2024, 1, 1),
+    tags=['archive']
+)
+def ecommerce_data_archival_pipeline():
+    bronze_archival_tasks = []
+    for table in MYSQL_TABLES:
+        bronze_task = PythonOperator(
+            task_id=f'archive_bronze_{table}',
+            python_callable=archive_old_data,
+            op_args=[
+                BRONZE_BASE_PATH,
+                ARCHIVE_BASE_PATH,
+                RETENTION_DAYS_BRONZE,
+                table,
+                True
+            ]
+        )
+        bronze_archival_tasks.append(bronze_task)
+
+    silver_archival_tasks = []
+    for table in ['orders']:
+        silver_task = PythonOperator(
+            task_id=f'archive_silver_{table}',
+            python_callable=archive_old_data,
+            op_args=[
+                SILVER_BASE_PATH,
+                os.path.join(ARCHIVE_BASE_PATH, 'silver'),
+                RETENTION_DAYS_SILVER,
+                f'{table}_cleaned',
+                False,
+            ]
+        )
+        silver_archival_tasks.append(silver_task)
+
+    bronze_archival_tasks
+
+
+ecommerce_data_archival_pipeline()

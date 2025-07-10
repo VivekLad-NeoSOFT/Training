@@ -25,8 +25,8 @@ MYSQL_TABLES = ['orders', 'customers', 'products']
     dag_id='ecommerce_data_pipeline',
     default_args={'owner': 'airflow', 'depends_on_past': False},
     description='Daily E-commerce Data Pipeline',
-    schedule='@daily',
-    # schedule=None,
+    # schedule='@daily',
+    schedule=None,
     start_date=datetime(2024, 1, 1),
     tags=['ecommerce', 'medallion']
 )
